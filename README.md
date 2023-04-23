@@ -1,112 +1,35 @@
-# ROS Wrapper for Intel&reg; RealSense&trade; Devices
-These are packages for using Intel RealSense cameras (D400 series SR300 camera and T265 Tracking Module) with ROS.
+# Noetic ROS Wrapper for Intel&reg; RealSense&trade; D415 series camera
+These are packages for using Intel RealSense camera (D415 series camera) with ROS.
 
-This version supports Kinetic, Melodic and Noetic distributions.
-
-For running in ROS2 environment please switch to the [ros2 branch](https://github.com/IntelRealSense/realsense-ros/tree/ros2). </br>
+This version supports Noetic distribution under ubuntu 20.04.
 
 LibRealSense2 supported version: v2.50.0 (see [realsense2_camera release notes](https://github.com/IntelRealSense/realsense-ros/releases))
 
-## Installation Instructions
-
-### Ubuntu
-   #### Step 1: Install the ROS distribution
-   - #### Install [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu), on Ubuntu 16.04, [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu) on Ubuntu 18.04 or [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu) on Ubuntu 20.04.
-
-### Windows
-   #### Step 1: Install the ROS distribution
-   - #### Install [ROS Melodic or later on Windows 10](https://wiki.ros.org/Installation/Windows)
-
-
-### There are 2 sources to install realsense2_camera from:
-
-* ### Method 1: The ROS distribution:
-
-  *Ubuntu*
-
-    realsense2_camera is available as a debian package of ROS distribution. It can be installed by typing:
-    
-    ```sudo apt-get install ros-$ROS_DISTRO-realsense2-camera```
-
-    This will install both realsense2_camera and its dependents, including librealsense2 library and matching udev-rules.
-
-    Notice:
-    * The version of librealsense2 is almost always behind the one availeable in RealSense&trade; official repository.
-    * librealsense2 is not built to use native v4l2 driver but the less stable RS-USB protocol. That is because the last is more general and operational on a larger variety of platforms.
-    * realsense2_description is available as a separate debian package of ROS distribution. It includes the 3D-models of the devices and is necessary for running launch files that include these models (i.e. rs_d435_camera_with_model.launch). It can be installed by typing:
-    `sudo apt-get install ros-$ROS_DISTRO-realsense2-description`
-
-  *Windows*
-
-    **Chocolatey distribution Coming soon**
-
-* ### Method 2: The RealSense&trade; distribution:
-     > This option is demonstrated in the [.travis.yml](https://github.com/intel-ros/realsense/blob/development/.travis.yml) file. It basically summerize the elaborate instructions in the following 2 steps:
-
-
-   ### Step 1: Install the latest Intel&reg; RealSense&trade; SDK 2.0
-
-    *Ubuntu*
-    
-    Install librealsense2 debian package:
-    * Jetson users - use the [Jetson Installation Guide](https://github.com/IntelRealSense/librealsense/blob/master/doc/installation_jetson.md)
-    * Otherwise, install from [Linux Debian Installation Guide](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages)
-      - In that case treat yourself as a developer. Make sure you follow the instructions to also install librealsense2-dev and librealsense2-dkms packages.
-
-    *Windows* 
-    Install using vcpkg
-
-        `vcpkg install realsense2:x64-windows` 
-
-   #### OR
-   - #### Build from sources by downloading the latest [Intel&reg; RealSense&trade; SDK 2.0](https://github.com/IntelRealSense/librealsense/releases/tag/v2.50.0) and follow the instructions under [Linux Installation](https://github.com/IntelRealSense/librealsense/blob/master/doc/installation.md)
-
-
-   ### Step 2: Install Intel&reg; RealSense&trade; ROS from Sources
+# Step 1: Install Intel&reg; RealSense&trade; ROS from Sources
    - Create a [catkin](http://wiki.ros.org/catkin#Installing_catkin) workspace
-   *Ubuntu*
    ```bash
    mkdir -p ~/catkin_ws/src
    cd ~/catkin_ws/src/
    ```
-   *Windows*
-   ```batch
-   mkdir c:\catkin_ws\src
-   cd c:\catkin_ws\src
-   ```
+    
 
    - Clone the latest Intel&reg; RealSense&trade; ROS from [here](https://github.com/intel-ros/realsense/releases) into 'catkin_ws/src/'
    ```bashrc
-   git clone https://github.com/IntelRealSense/realsense-ros.git
-   cd realsense-ros/
-   git checkout `git tag | sort -V | grep -P "^2.\d+\.\d+" | tail -1`
-   cd ..
+   git clone https://github.com/ibooooowl/realsense-ros.git
    ```
-   - Make sure all dependent packages are installed. You can check .travis.yml file for reference.
-   - Specifically, make sure that the ros package *ddynamic_reconfigure* is installed. If *ddynamic_reconfigure* cannot be installed using APT or if you are using *Windows* you may clone it into your workspace 'catkin_ws/src/' from [here](https://github.com/pal-robotics/ddynamic_reconfigure/tree/kinetic-devel)
 
-
-   ```bash
-  catkin_init_workspace
+   ```bash 
   cd ..
-  catkin_make clean
-  catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release
+  catkin_make  
   catkin_make install
   ```
-
-  *Ubuntu*
+ 
   ```bash
   echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
   source ~/.bashrc
   ```
-
-  *Windows*
-  ```batch
-  devel\setup.bat
-  ```
-
-## Usage Instructions
-
+ 
+ 
 ### Start the camera node
 To start the camera node in ROS:
 
@@ -133,27 +56,10 @@ After running the above command with D435i attached, the following list of topic
 - /camera/infra1/camera_info
 - /camera/infra1/image_rect_raw
 - /camera/infra2/camera_info
-- /camera/infra2/image_rect_raw
-- /camera/gyro/imu_info
-- /camera/gyro/metadata
-- /camera/gyro/sample
-- /camera/accel/imu_info
-- /camera/accel/metadata
-- /camera/accel/sample
+- /camera/infra2/image_rect_raw 
 - /diagnostics
 
->Using an L515 device the list differs a little by adding a 4-bit confidence grade (pulished as a mono8 image):
->- /camera/confidence/camera_info
->- /camera/confidence/image_rect_raw
->
->It also replaces the 2 infrared topics with the single available one:
->- /camera/infra/camera_info
->- /camera/infra/image_raw
-
-
-The "/camera" prefix is the default and can be changed. Check the rs_multiple_devices.launch file for an example.
-If using D435 or D415, the gyro and accel topics wont be available. Likewise, other topics will be available when using T265 (see below).
-
+ 
 ### Launch parameters
 The following parameters are available by the wrapper:
 - **serial_no**: will attach to the device with the given serial number (*serial_no*) number. Default, attach to available RealSense device in random.
@@ -259,30 +165,7 @@ roslaunch realsense2_camera rs_camera.launch camera:=cam_2 serial_no:=<serial nu
 ...
 
 ```
-## Using T265 ##
-
-### Start the camera node
-To start the camera node in ROS:
-
-```bash
-roslaunch realsense2_camera rs_t265.launch
-```
-
-This will stream all camera sensors and publish on the appropriate ROS topics.
-
-The T265 sets its usb unique ID during initialization and without this parameter it wont be found.
-Once running it will publish, among others, the following topics:
-- /camera/odom/sample
-- /camera/accel/sample
-- /camera/gyro/sample
-- /camera/fisheye1/image_raw
-- /camera/fisheye2/image_raw
-
-To visualize the pose output and frames in RViz, start:
-```bash
-roslaunch realsense2_camera demo_t265.launch
-```
-
+ 
 ### About Frame ID
 The wrapper publishes static transformations(TFs). The Frame Ids are divided into 3 groups:
 - ROS convention frames: follow the format of <tf_prefix>\_<\_stream>"\_frame" for example: camera_depth_frame, camera_infra1_frame, etc.
